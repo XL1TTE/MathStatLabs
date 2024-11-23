@@ -21,8 +21,19 @@ a1 = MathStatistics.GetExpectedValue(data)
 s2 = MathStatistics.GetVariance_Shifted(data) ** 0.5
 s20 = MathStatistics.GetVariance_NoShifted(data) ** 0.5
 
-fx = [MathStatistics.Distributions.Distribution_Normal(x, a1, s20) for x in sorted(data)]
+test = [x for x in range(-5, 6)]
 
-GraphicsBuilder.Graphics.BuildLinierFigure(sorted(data), fx, outpath="my_plot.png", label_x="Values", label_y="Probability")
-GraphicsBuilder.Graphics.BuildHistogramFigure(data, outpath="hist.png")
-GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure(sorted(data), fx, figure_title="TEST")
+fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribution_function(x, a1, s20) for x in sorted(data)]
+
+GraphicsBuilder.Graphics.BuildLinierFigure(sorted(data), fx, outpath="Cumulative_Normal.png", label_x="Values", label_y="Probability")
+
+# GraphicsBuilder.Graphics.BuildHistogramFigure(data, outpath="hist.png")
+# GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure(sorted(data), fx, figure_title="TEST")
+
+# quartiles = [0, 0.25, 0.5, 0.75, 1]
+
+# print(MathStatistics.Get_median_value_for_sample(data))
+
+# for q in quartiles:
+#     print(MathStatistics.Get_Nth_Quartile(data, p=q), q)
+

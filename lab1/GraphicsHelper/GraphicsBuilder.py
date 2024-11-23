@@ -22,20 +22,23 @@ class Graphics:
                 self.StartPoints[point] += self.BarWidth / 2
 
     @staticmethod
-    def BuildLinierFigure(x: list, y: list, outpath: str, 
+    def BuildLinierFigure(x: list, y: list,
+                           outpath: str,
+                           mode: str,
                            label_x: str = None, 
                            label_y: str = None,
                            color: str = 'black',
-                           figure_title: str = "Scatter"):
+                           figure_title: str = "Scatter",):
         
         sns.set_theme(style='whitegrid')
 
         axes = plt.subplot()
+        
         axes.plot(x, y, color=color, linewidth=2)
         axes.set_title(figure_title)
         axes.set_xlabel(label_x)
         axes.set_ylabel(label_y)
-
+            
         plt.savefig(outpath)
         plt.close()
 
@@ -95,7 +98,3 @@ class Graphics:
 
         plt.savefig(outpath)
         plt.close()
-
-
-
-
