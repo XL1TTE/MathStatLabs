@@ -5,6 +5,16 @@ import math
 
 class Graphics:
 
+
+    class BuildData:
+        def __init__(self, x, y, color:str = "black"):
+            self.X = x
+            self.Y = y
+            self.Color = color
+        X: list[float | int]
+        Y: list[float | int]
+        Color: str
+
     class HistagramData:
         def __init__(self, heights: list[float | int], start_points: list[float | int], bar_width: float | int):
             self.Heights = heights
@@ -84,7 +94,7 @@ class Graphics:
         plt.close()
 
     @staticmethod
-    def Build_Mixed_Hist_Linear_Figure(x: list, y: list, figure_title: str, outpath: str = "Mixed_plot.png"):
+    def Build_Mixed_Hist_Linear_Figure(x: list, y: list, figure_title: str = "Plot", outpath: str = "plot.png"):
         data: Graphics.HistagramData = Graphics.Compile_Data_For_Hist_Figure(x=x)
         
         plt.figure()
@@ -96,5 +106,37 @@ class Graphics:
         
         plt.bar(x=data.StartPoints, height=data.Heights, width=data.BarWidth, color='blue')
 
+        plt.savefig(outpath)
+        plt.close()
+    
+    @staticmethod
+    def Build_Many_Linear_InOne_Plot(BuildDatas: list[BuildData], outpath: str = "plot.png", title: str = "MixedLinear", label_x: str = "X", label_y:str = "Y"):
+                
+        sns.set_theme(style='whitegrid')
+        for data in BuildDatas:
+
+            axes = plt.subplot()
+            
+            axes.plot(data.X, data.Y, color=data.Color, linewidth=2)
+            axes.set_title(title)
+            axes.set_xlabel(label_x)
+            axes.set_ylabel(label_y)
+            
+        plt.savefig(outpath)
+        plt.close()
+
+    @staticmethod
+    def Build_Many_Scatter_InOne_Plot(BuildDatas: list[BuildData], outpath: str = "plot.png", title: str = "MixedLinear", label_x: str = "X", label_y:str = "Y"):
+                
+        sns.set_theme(style='whitegrid')
+        for data in BuildDatas:
+
+            axes = plt.subplot()
+            
+            axes.scatter(data.X, data.Y, color=data.Color, linewidth=2)
+            axes.set_title(title)
+            axes.set_xlabel(label_x)
+            axes.set_ylabel(label_y)
+            
         plt.savefig(outpath)
         plt.close()
