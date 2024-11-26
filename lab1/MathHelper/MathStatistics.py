@@ -1,6 +1,7 @@
 import numpy as np
-import math
 from enum import Enum
+import math
+from scipy import stats as stats
 
 
 class Interval:
@@ -37,17 +38,63 @@ class Distributions:
 
     class Normal_Distribution:
 
-        def Probability_density_function(x: float | int, expectation: float, variance: float) -> float:
-            part1 = 1 / (variance**0.5 * (np.pi * 2)**(1/2))
-            part2 = np.exp(-0.5 * ((x - expectation) / variance**0.5)**2)
+        @staticmethod
+        def Probability_density_function_theory(x: float | int, expectation: float, variance: float) -> float:
+            part1: float = 1 / (np.sqrt(variance) * (np.pi * 2)**(1/2))
+            part2: float = np.exp(-0.5 * ((x - expectation) / (np.sqrt(variance)))**2)
             return part1 * part2
-        
-        def Cumulative_distribution_function(x: float | int, expectation: float, variance: float, deapth: int = 100) -> float:
-            body_of_erf = (x - expectation) / (variance**0.5 * np.sqrt(2)) 
-            erf = find_erf(body_of_erf, deapth)
+        @staticmethod
+        def Cumulative_distribution_function_theory(x: float | int, expectation: float, variance: float) -> float:
+            body_of_erf: float = (x - expectation) / (np.sqrt(variance) * np.sqrt(2)) 
+            erf: float = math.erf(body_of_erf)
 
             return (1 + erf) / 2
-    
+        @staticmethod
+        def Cumulative_distribuion_function_emp(x: float | int, sample: list) -> float:
+            Sum = 0
+            for item in sample:
+                    Sum += Heaviside_function(x - item)
+            return Sum / len(sample)
+        
+        @staticmethod
+        def Generate_pdf_data(step: float = 0.1, expectation: float | int = 0, variance: float | int = 1) -> tuple[list[float], list[float]]:
+            sigma = Round(np.sqrt(variance), 2)
+            Breadth = Interval(-4 * sigma, 4 * sigma, mode=Interval.Mode.Include_Both)
+
+            x = []
+            y = []
+
+            while(Breadth.a < Breadth.b):
+                x.append(Breadth.a)
+                y.append(Distributions.Normal_Distribution.Probability_density_function_theory(Breadth.a, expectation=expectation, variance=variance))
+
+                Breadth.a += step
+            return x, y
+        
+        @staticmethod
+        def Generate_cdf_data(step: float = 0.1, expectation: float | int = 0, variance: float | int = 1) -> tuple[list[float], list[float]]:
+            sigma = Round(np.sqrt(variance), 2)
+            Breadth = Interval(-4 * sigma, 4 * sigma, mode=Interval.Mode.Include_Both)
+
+            x = []
+            y = []
+
+            while(Breadth.a < Breadth.b):
+                x.append(Breadth.a)
+                y.append(Distributions.Normal_Distribution.Cumulative_distribution_function_theory(Breadth.a, expectation=expectation, variance=variance))
+
+                Breadth.a += step
+            return x, y
+
+
+@staticmethod
+def Round(value: float, decimals:int =2):
+    factor = 10 ** decimals
+    return round(value * factor) / factor
+
+def Heaviside_function(x: float | int) -> int:
+    return 0 if x < 0 else 1 
+
 
 def GetVariance_Shifted(sample: list[int| float]):
     SumOfSquareDeviationsFromEx: float = 0
@@ -92,7 +139,7 @@ def GetExpectedValue(sample: list[float | int]) -> float:
         Sum += i
     return Sum / len(sample)
 
-def Get_Nth_Quantile(sample: list, p: float):
+def Get_Nth_Quantile_sample(sample: list, p: float):
     ordered_sample = sorted(sample)
     N = len(ordered_sample)
 
@@ -147,7 +194,7 @@ def Get_ConfidenceInterval_of_Mean(sample: list[int | float], significance_level
         standart_t = np.random.standard_t(N-1, 1000)
 
         quantile_level = 1 - (significance_level / 2)
-        t = Get_Nth_Quantile(standart_t, quantile_level)
+        t = stats.t.ppf(quantile_level, N-1)
 
         formule_body = (t  * sample_variance_noShifted**0.5) / N**0.5
 
@@ -158,11 +205,9 @@ def Get_ConfidenceInterval_of_Mean(sample: list[int | float], significance_level
 
         return interval
     else:
-        standart_normal = np.random.normal(0, 1, 1000)
-
         quantile_level = 1 - (significance_level / 2)
 
-        r = Get_Nth_Quantile(standart_normal, quantile_level) 
+        r = stats.norminvgauss.ppf(quantile_level) 
         N = len(sample)
 
         formule_body =  (r * theory_variance**0.5) / N**0.5
@@ -180,13 +225,12 @@ def Get_ConfidenceInterval_of_Variance(sample: list[int | float], significance_l
     
     if(theory_mean == None):
         N = len(sample)
-        chi_square = np.random.chisquare(N-1, 1000)
 
         quantile_level_g1 = significance_level / 2
         quantile_level_g2 = 1 - (significance_level / 2)
 
-        g1 = Get_Nth_Quantile(sample=chi_square, p=quantile_level_g1)
-        g2 = Get_Nth_Quantile(sample=chi_square, p=quantile_level_g2)
+        g1 = stats.chi2.ppf(quantile_level_g1, N)
+        g2 = stats.chi2.ppf(quantile_level_g2, N)
 
         formule_body = ((N-1) * sample_variance_noShifted)
 
@@ -207,8 +251,8 @@ def Get_ConfidenceInterval_of_Variance(sample: list[int | float], significance_l
         quantile_level_g1 = significance_level / 2
         quantile_level_g2 = 1 - (significance_level / 2)
 
-        g1 = Get_Nth_Quantile(sample=chi_square, p=quantile_level_g1)
-        g2 = Get_Nth_Quantile(sample=chi_square, p=quantile_level_g2)
+        g1 = stats.chi2.ppf(quantile_level_g1, N-1)
+        g2 = stats.chi2.ppf(quantile_level_g2, N-1)
 
         a = variance_sum / g2
         b = variance_sum / g1
@@ -217,22 +261,25 @@ def Get_ConfidenceInterval_of_Variance(sample: list[int | float], significance_l
         return interval
 
 
-def Get_MeanConfidenceIntervalLenght_SignificanceLevel_Relation_Data(sample: list, partition_mean: float, partition_variance_noShifted) -> tuple[list[float], list[float]]:
-    x_mean_confidance_interval_lenghts= []
+def Get_MeanConfidenceIntervalLenght_SignificanceLevel_Relation_Data(sample: list, partition_mean: float, partition_variance_noShifted: float, sign_level_step: float = 0.0001, TL_From: float = 0.9, TL_To: float = 1.0) -> tuple[list[float], list[float]]:
+    
+    x: list[float] = []
+    y: list[float] = []
 
-    y_significance_levels = []
+    current, end = TL_From, TL_To
 
-    for significance_level in range(10, 1011, 1):
+    while(current < end):
 
-        significance_level = 1 / significance_level
+        x.append(current)
 
-        y_significance_levels.append(1 - significance_level)
+        partition_Mean_CI = Get_ConfidenceInterval_of_Mean(sample, (1 - current), partition_mean, partition_variance_noShifted)
 
-        partition_Mean_CI = Get_ConfidenceInterval_of_Mean(sample, significance_level, partition_mean, partition_variance_noShifted)
+        y.append(partition_Mean_CI.get_lenght())
 
-        x_mean_confidance_interval_lenghts.append(partition_Mean_CI.get_lenght())
+        current += sign_level_step
+        current = Round(current, 6)
 
-    return x_mean_confidance_interval_lenghts, y_significance_levels
+    return x, y
 
 def Get_VarianceConfidenceIntervalLenght_SignificanceLevel_Relation_Data(sample: list, partition_variance_noShifted) -> tuple[list[float], list[float]]:
     x_variance_confidance_interval_lenghts= []

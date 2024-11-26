@@ -40,42 +40,47 @@ partition_third_variance_Shifted = MathStatistics.GetVariance_Shifted(partition_
 # for q in quartiles:
 #     print(MathStatistics.Get_Nth_Quantile(partition_third_data, p=q), q)
 
-partition_first_fx = [MathStatistics.Distributions.Normal_Distribution.Probability_density_function(x, partition_first_mean, partition_first_variance_NoShifted) for x in partition_first_data]
-partition_first_buildData =  GraphicsBuilder.Graphics.BuildData(partition_first_data, partition_first_fx, color='Yellow')
-
-partition_second_fx = [MathStatistics.Distributions.Normal_Distribution.Probability_density_function(x, partition_second_mean, partition_second_variance_NoShifted) for x in partition_second_data]
-partition_second_buildData =  GraphicsBuilder.Graphics.BuildData(partition_second_data, partition_second_fx, color='Red')
-
-partition_third_fx = [MathStatistics.Distributions.Normal_Distribution.Probability_density_function(x, partition_third_mean, partition_third_variance_NoShifted) for x in partition_third_data]
-partition_third_buildData =  GraphicsBuilder.Graphics.BuildData(partition_third_data, partition_third_fx, color='Blue')
 
 
-BuildDatas_probability_density_functions = [partition_first_buildData, partition_second_buildData, partition_third_buildData]
+partition_first_fx_theory_x, partition_first_fx_theory_y  = MathStatistics.Distributions.Normal_Distribution.Generate_pdf_data(expectation=partition_first_mean, variance=partition_first_variance_NoShifted)
+partition_first_fx_theory_buildData =  GraphicsBuilder.Graphics.BuildData(partition_first_fx_theory_x, partition_first_fx_theory_y, color='Yellow')
+partition_first_fx_histogram_data = GraphicsBuilder.Graphics.Calculate_data_for_Histagram(partition_first_data)
 
-# GraphicsBuilder.Graphics.Build_Many_Linear_InOne_Plot(BuildDatas=BuildDatas_probability_density_functions, outpath="Images//Combined_samples_prob_func.png", label_x="Values", label_y="Probability")
+partition_second_fx_theory_x, partition_second_fx_theory_y  = MathStatistics.Distributions.Normal_Distribution.Generate_pdf_data(expectation=partition_second_mean, variance=partition_second_variance_NoShifted)
+partition_second_fx_theory_buildData =  GraphicsBuilder.Graphics.BuildData(partition_second_fx_theory_x, partition_second_fx_theory_y, color='Red')
+partition_second_fx_histogram_data = GraphicsBuilder.Graphics.Calculate_data_for_Histagram(partition_second_data)
 
-# GraphicsBuilder.Graphics.BuildHistogramFigure(partition_first_data, outpath="Images//FirstPartition//first_sample_hist.png")
-# GraphicsBuilder.Graphics.BuildHistogramFigure(partition_second_data, outpath="Images//SecondPartition//second_sample_hist.png")
-# GraphicsBuilder.Graphics.BuildHistogramFigure(partition_third_data, outpath="Images//ThirdPartition//third_sample_hist.png")
-
-
-# GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure(partition_first_data, partition_first_fx, outpath="Images//FirstPartition//first_sample_hist_linear.png")
-# GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure(partition_second_data, partition_second_fx, outpath="Images//SecondPartition//second_sample_hist_linear.png")
-# GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure(partition_third_data, partition_third_fx, outpath="Images//ThirdPartition//third_sample_hist_linear.png")
+partition_third_fx_theory_x, partition_third_fx_theory_y  = MathStatistics.Distributions.Normal_Distribution.Generate_pdf_data(expectation=partition_third_mean, variance=partition_third_variance_NoShifted)
+partition_third_fx_theory_buildData =  GraphicsBuilder.Graphics.BuildData(partition_third_fx_theory_x, partition_third_fx_theory_y, color='Blue')
+partition_third_fx_histogram_data = GraphicsBuilder.Graphics.Calculate_data_for_Histagram(partition_third_data)
 
 
-partition_first_fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribution_function(x, partition_first_mean, partition_first_variance_NoShifted) for x in partition_first_data]
-partition_first_buildData =  GraphicsBuilder.Graphics.BuildData(partition_first_data, partition_first_fx, color='Yellow')
+GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure([partition_first_fx_histogram_data], [partition_first_fx_theory_buildData] ,outpath="Images//FirstPartition//histogram_theoryfx.png")
+GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure([partition_second_fx_histogram_data], [partition_second_fx_theory_buildData] ,outpath="Images//SecondPartition//histogram_theoryfx.png")
+GraphicsBuilder.Graphics.Build_Mixed_Hist_Linear_Figure([partition_third_fx_histogram_data], [partition_third_fx_theory_buildData] ,outpath="Images//ThirdPartition//histogram_theoryfx.png")
 
-partition_second_fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribution_function(x, partition_second_mean, partition_second_variance_NoShifted) for x in partition_second_data]
-partition_second_buildData =  GraphicsBuilder.Graphics.BuildData(partition_second_data, partition_second_fx, color='Red')
 
-partition_third_fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribution_function(x, partition_third_mean, partition_third_variance_NoShifted) for x in partition_third_data]
-partition_third_buildData =  GraphicsBuilder.Graphics.BuildData(partition_third_data, partition_third_fx, color='Blue')
+partition_first_Fx_theory_x, partition_first_Fx_theory_y = MathStatistics.Distributions.Normal_Distribution.Generate_cdf_data(expectation=partition_first_mean, variance=partition_first_variance_NoShifted)
+partition_first_Fx_theory_buildData =  GraphicsBuilder.Graphics.BuildData(partition_first_Fx_theory_x, partition_first_Fx_theory_y, color='Yellow')
 
-BuildDatas_cumulative_functions = [partition_first_buildData, partition_second_buildData, partition_third_buildData]
+partition_first_sample_Fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribuion_function_emp(x, partition_first_data) for x in partition_first_data]
+partition_first_sample_Fx_Build_Data = GraphicsBuilder.Graphics.BuildData(partition_first_data, partition_first_sample_Fx)
+GraphicsBuilder.Graphics.Build_Mixed_Linear_Step_Figure([partition_first_sample_Fx_Build_Data], [partition_first_Fx_theory_buildData], outpath="Images//FirstPartition//Fx_theory_sample.png")
 
-# GraphicsBuilder.Graphics.Build_Many_Linear_InOne_Plot(BuildDatas=BuildDatas_cumulative_functions, outpath="Images//Combined_sample_cumulative_func.png", label_x="Values", label_y="Probabilities")
+
+partition_second_Fx_theory_x, partition_second_Fx_theory_y = MathStatistics.Distributions.Normal_Distribution.Generate_cdf_data(expectation=partition_second_mean, variance=partition_second_variance_NoShifted)
+partition_second_Fx_theory_buildData =  GraphicsBuilder.Graphics.BuildData(partition_second_Fx_theory_x, partition_second_Fx_theory_y, color='Red')
+
+partition_second_sample_Fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribuion_function_emp(x, partition_second_data) for x in partition_second_data]
+partition_second_sample_Fx_Build_Data = GraphicsBuilder.Graphics.BuildData(partition_second_data, partition_second_sample_Fx)
+GraphicsBuilder.Graphics.Build_Mixed_Linear_Step_Figure([partition_second_sample_Fx_Build_Data], [partition_second_Fx_theory_buildData], outpath="Images//SecondPartition//Fx_theory_sample.png")
+
+partition_third_Fx_theory_x, partition_third_Fx_theory_y = MathStatistics.Distributions.Normal_Distribution.Generate_cdf_data(expectation=partition_third_mean, variance=partition_third_variance_NoShifted)
+partition_third_Fx_theory_buildData =  GraphicsBuilder.Graphics.BuildData(partition_third_Fx_theory_x, partition_third_Fx_theory_y, color='Blue')
+
+partition_third_sample_Fx = [MathStatistics.Distributions.Normal_Distribution.Cumulative_distribuion_function_emp(x, partition_third_data) for x in partition_third_data]
+partition_third_sample_Fx_Build_Data = GraphicsBuilder.Graphics.BuildData(partition_third_data, partition_third_sample_Fx)
+GraphicsBuilder.Graphics.Build_Mixed_Linear_Step_Figure([partition_third_sample_Fx_Build_Data], [partition_third_Fx_theory_buildData], outpath="Images//ThirdPartition//Fx_theory_sample.png")
 
 
 partition_first_Mean_CI = MathStatistics.Get_ConfidenceInterval_of_Mean(partition_first_data, 0.05, partition_first_mean, partition_first_variance_NoShifted)
@@ -98,16 +103,18 @@ print(f"Для третьей выборки:\nВыборочное средне
 
 x,y = MathStatistics.Get_MeanConfidenceIntervalLenght_SignificanceLevel_Relation_Data(partition_first_data, partition_first_mean, partition_first_variance_NoShifted)
 
-partition_first_MeanConfidenceIL_SignificaneLevel_BuildData = GraphicsBuilder.Graphics.BuildData(x, y, color='Yellow')
+partition_first_CI_SL_BuildData = GraphicsBuilder.Graphics.BuildData(x, y, color='Yellow')
 
 x,y = MathStatistics.Get_MeanConfidenceIntervalLenght_SignificanceLevel_Relation_Data(partition_second_data, partition_second_mean, partition_second_variance_NoShifted)
 
-partition_second_MeanConfidenceIL_SignificaneLevel_BuildData = GraphicsBuilder.Graphics.BuildData(x, y, color='red')
+partition_second_CI_SL_BuildData = GraphicsBuilder.Graphics.BuildData(x, y, color='red')
 
 x,y = MathStatistics.Get_MeanConfidenceIntervalLenght_SignificanceLevel_Relation_Data(partition_third_data, partition_third_mean, partition_third_variance_NoShifted)
-partition_third_MeanConfidenceIL_SignificaneLevel_BuildData = GraphicsBuilder.Graphics.BuildData(x, y, color='blue')
+partition_third_CI_SL_BuildData = GraphicsBuilder.Graphics.BuildData(x, y, color='blue')
 
 
-DataBuilds = [partition_first_MeanConfidenceIL_SignificaneLevel_BuildData, partition_second_MeanConfidenceIL_SignificaneLevel_BuildData, partition_third_MeanConfidenceIL_SignificaneLevel_BuildData]
+DataBuilds = [partition_first_CI_SL_BuildData, partition_second_CI_SL_BuildData, partition_third_CI_SL_BuildData]
 
-GraphicsBuilder.Graphics.Build_Many_Scatter_InOne_Plot(DataBuilds, outpath="test.png") 
+GraphicsBuilder.Graphics.Build_Many_Linear_InOne_Plot(DataBuilds, outpath="CI_lenght.png") 
+
+
